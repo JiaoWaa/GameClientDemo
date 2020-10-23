@@ -8,6 +8,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Target.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
+//#include "Projectile.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMyDemoCharacter
@@ -43,6 +49,12 @@ AMyDemoCharacter::AMyDemoCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	GunWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunWeapon"));
+	GunWeapon->SetupAttachment(GetMesh(), TEXT("weapon"));
+
+	goal = 0;
+	//currentGoal = 0;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -74,6 +86,8 @@ void AMyDemoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMyDemoCharacter::OnResetVR);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyDemoCharacter::Fire);
 }
 
 
@@ -132,3 +146,81 @@ void AMyDemoCharacter::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+void AMyDemoCharacter::Fire()
+{
+	// 尝试发射物体。
+/*
+	if (ProjectileClass)
+	{
+		// 获取摄像机变换。
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+		// 将 MuzzleOffset 从摄像机空间变换到世界空间。
+		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
+		FRotator MuzzleRotation = CameraRotation;
+		// 将准星稍微上抬。
+		//MuzzleRotation.Pitch += 10.0f;
+		MuzzleLocation.Z += 10.0f;
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+			// 在枪口处生成发射物。
+			AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+			if (Projectile)
+			{
+				// 设置发射物的初始轨道。
+				FVector LaunchDirection = MuzzleRotation.Vector();
+				Projectile->FireInDirection(LaunchDirection);
+			}
+		}
+	}
+*/
+	FVector FireStart = GunWeapon->GetSocketLocation(TEXT("Muzzle"));
+	FVector FireEnd = FollowCamera->GetForwardVector() * 5000 + FireStart;
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult OutHit;
+	
+	UKismetSystemLibrary::LineTraceSingle(this, FireStart, FireEnd, ETraceTypeQuery::TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true);
+
+	if (OutHit.GetActor() != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, OutHit.GetActor()->GetName());
+		if (OutHit.GetActor()->GetName() == "target_1") this->goal += 1;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::FromInt(this->goal));
+	}
+		
+}
+
+/*
+void AMyDemoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMyDemoCharacter, currentGoal);
+}
+
+void AMyDemoCharacter::OnGoalUpdate()
+{
+	if (IsLocallyControlled())
+	{
+		FString goalMessage = FString::Printf(TEXT("You now have %f."), currentGoal);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, goalMessage);
+
+	}
+
+	//服务器特定的功能
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		FString goalMessage = FString::Printf(TEXT("%s now has %f."), *GetFName().ToString(), currentGoal);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, goalMessage);
+	}
+
+}
+*/
+

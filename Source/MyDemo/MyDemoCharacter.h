@@ -21,6 +21,8 @@ class AMyDemoCharacter : public ACharacter
 public:
 	AMyDemoCharacter();
 
+	//void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -28,6 +30,26 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+	UFUNCTION()
+		void Fire();
+
+	// 从摄像机位置的枪口偏移
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	//	FVector MuzzleOffset;
+
+	// 生成的发射物类
+	//UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	//	TSubclassOf<class AProjectile> ProjectileClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		class USkeletalMeshComponent* GunWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int32 goal;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//	bool isHip;
 
 protected:
 
@@ -57,6 +79,14 @@ protected:
 
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+
+	//UPROPERTY(ReplicatedUsing=OnRep_CurrentGoal)
+	//	int32 currentGoal;
+
+	//UFUNCTION()
+	//	void OnRep_CurrentGoal();
+
+	//void OnGoalUpdate();
 
 protected:
 	// APawn interface
