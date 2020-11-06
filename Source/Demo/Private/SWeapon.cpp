@@ -45,7 +45,7 @@ bool ASWeapon::Fire()
 	AActor* MyOwner = GetOwner();
 	if (MyOwner) 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Local Fire Call"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Local Fire Call"));
 		FVector EyeLocation;
 		FRotator EyeRotator;
 		MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotator);
@@ -60,7 +60,7 @@ bool ASWeapon::Fire()
 		{
 			AActor* HitActor = Hit.GetActor();
 			
-			GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Red, HitActor->GetName());
+			//GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Red, HitActor->GetName());
 			if (HitActor->GetName() == TEXT("BP_Target_2"))
 				bIsHitTarget = true;
 
@@ -70,7 +70,7 @@ bool ASWeapon::Fire()
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 			TraceEndPoint = Hit.ImpactPoint;
 		}
-		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
+		//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
 
 		PlayFireEffects(TraceEndPoint);
 	}

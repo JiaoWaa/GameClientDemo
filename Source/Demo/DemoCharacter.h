@@ -72,6 +72,7 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
 
+	UFUNCTION(BlueprintCallable, Category = "Player")
 	void Fire();
 
 	virtual void BeginPlay() override;
@@ -97,6 +98,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void SetGoal();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void SetGoalBlueprintVersion(int32 LastTimeGoal);
 
 	UFUNCTION(Server, Reliable)
 	void HandleFire();

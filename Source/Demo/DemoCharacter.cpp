@@ -55,12 +55,12 @@ void ADemoCharacter::OnGoalUpdate()
 {
 	if (IsLocallyControlled())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("CLIENT"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("CLIENT"));
 	}
 
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("SERVER"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("SERVER"));
 	}
 }
 
@@ -152,6 +152,11 @@ void ADemoCharacter::SetGoal()
 	}
 }
 
+void ADemoCharacter::SetGoalBlueprintVersion(int32 LastTimeGoal)
+{
+	Goal = LastTimeGoal;
+}
+
 
 void ADemoCharacter::HandleFire_Implementation()
 {
@@ -173,7 +178,7 @@ void ADemoCharacter::Fire()
 			{
 				SetGoal();
 			}
-			GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Yellow, FString::FromInt(Goal));
+			//GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Yellow, FString::FromInt(Goal));
 		}
 	}
 }
