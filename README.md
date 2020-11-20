@@ -12,6 +12,14 @@ For some reasons of net and wrong operations, I created a new project named **De
 
 **Third Homework Statement:** Add an **UMG** including **shoot button**, **jump button** and **rank button**.  And user can modify his name in rank interface. (Here is a bug waiting to be fixed that the user can modify all recording name. I will fix it as soon as I can)
 
+Fourth Homework Statement: Add skeletal animations to my demo. The features that I achieve are as follow:
+
+- Basic movement animation: Idle, walk, run and jump.
+- Aim offset.
+- A fire animation(I blend the fire animation with the aim offset)
+- A throw animation(like throw grenade)
+- free perspective(press 'alt' to enter free perspective and release to quit)
+
 ## Package Files and video
 
 Link: https://pan.baidu.com/s/1Ib5EYS09hUD7_Xym1qJJfQ 

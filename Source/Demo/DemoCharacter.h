@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "DemoCharacter.generated.h"
 
+class UAnimMontage;
+
 UCLASS(config=Game)
 class ADemoCharacter : public ACharacter
 {
@@ -53,10 +55,12 @@ protected:
 	void LookUpAtRate(float Rate);
 
 	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
+
+	//void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 
 	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+
+	//void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 protected:
 	// APawn interface
@@ -104,6 +108,18 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void HandleFire();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowMontage(UAnimMontage* ThrowAnim);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ThrowMontageServer(UAnimMontage* ThrowAnim);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ThrowMontageMulticast(UAnimMontage* ThrowAnim);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	class UAnimMontage* ThrowMontageAnim;
 
 };
 

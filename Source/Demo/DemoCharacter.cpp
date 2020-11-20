@@ -13,6 +13,7 @@
 #include "SWeapon.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
+#include "Animation/AnimMontage.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADemoCharacter
@@ -125,8 +126,8 @@ void ADemoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ADemoCharacter::LookUpAtRate);
 
 	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ADemoCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ADemoCharacter::TouchStopped);
+	//PlayerInputComponent->BindTouch(IE_Pressed, this, &ADemoCharacter::TouchStarted);
+	//PlayerInputComponent->BindTouch(IE_Released, this, &ADemoCharacter::TouchStopped);
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ADemoCharacter::OnResetVR);
@@ -141,7 +142,6 @@ void ADemoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ADemoCharacter, CurrentWeapon);
 	DOREPLIFETIME(ADemoCharacter, Goal);
 }
-
 
 void ADemoCharacter::SetGoal()
 {
@@ -158,6 +158,26 @@ void ADemoCharacter::SetGoalBlueprintVersion(int32 LastTimeGoal)
 }
 
 
+void ADemoCharacter::ThrowMontage(UAnimMontage* ThrowAnim)
+{
+	ThrowMontageServer(ThrowAnim);
+}
+
+void ADemoCharacter::ThrowMontageMulticast_Implementation(UAnimMontage* ThrowAnim)
+{
+	PlayAnimMontage(ThrowAnim);
+}
+
+void ADemoCharacter::ThrowMontageServer_Implementation(UAnimMontage* ThrowAnim)
+{
+	ThrowMontageMulticast(ThrowAnim);
+}
+
+bool ADemoCharacter::ThrowMontageServer_Validate(UAnimMontage* ThrowAnim)
+{
+	return true;
+}
+
 void ADemoCharacter::HandleFire_Implementation()
 {
 	SetGoal();
@@ -168,6 +188,7 @@ void ADemoCharacter::Fire()
 	if (CurrentWeapon)
 	{
 		bool isHitTarget = CurrentWeapon->Fire();
+
 		if (isHitTarget)
 		{
 			if (GetLocalRole() < ROLE_Authority)
@@ -178,7 +199,6 @@ void ADemoCharacter::Fire()
 			{
 				SetGoal();
 			}
-			//GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Yellow, FString::FromInt(Goal));
 		}
 	}
 }
@@ -188,7 +208,7 @@ void ADemoCharacter::OnResetVR()
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-void ADemoCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+/*void ADemoCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
 		Jump();
 }
@@ -196,7 +216,7 @@ void ADemoCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Locatio
 void ADemoCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
 		StopJumping();
-}
+}*/
 
 void ADemoCharacter::TurnAtRate(float Rate)
 {
