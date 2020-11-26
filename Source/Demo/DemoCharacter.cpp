@@ -163,6 +163,24 @@ void ADemoCharacter::ThrowMontage(UAnimMontage* ThrowAnim)
 	ThrowMontageServer(ThrowAnim);
 }
 
+void ADemoCharacter::SetCurrentWeapon()
+{
+	FActorSpawnParameters SpawmParams;
+	SpawmParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Destroy();
+	}
+
+	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StartWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawmParams);
+
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+	}
+}
+
 void ADemoCharacter::ThrowMontageMulticast_Implementation(UAnimMontage* ThrowAnim)
 {
 	PlayAnimMontage(ThrowAnim);

@@ -20,6 +20,13 @@ For some reasons of net and wrong operations, I created a new project named **De
 - A throw animation(like throw grenade)
 - free perspective(press 'alt' to enter free perspective and release to quit)
 
+**Fifth Homework Statement:** Physics System:
+
+- Pick up a weapon.
+- Shoot different parts of body with different sound.(The sounds of leg and arm are quite weird)
+- Grenade weapon and explosion effect.
+- Four physics materials: grass, ground, wood and water. 
+
 ## Package Files and video
 
 Link: https://pan.baidu.com/s/1Ib5EYS09hUD7_Xym1qJJfQ 

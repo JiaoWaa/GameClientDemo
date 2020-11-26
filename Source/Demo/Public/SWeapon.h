@@ -44,7 +44,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	bool Fire();
+	virtual bool Fire();
 	
 	/*UFUNCTION(Server, Reliable, WithValidation)
 	void ServerFire();*/
