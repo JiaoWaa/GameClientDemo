@@ -5,7 +5,7 @@
 #include "Engine/World.h"
 #include "Components/SkeletalMeshComponent.h"
 
-bool ASProjectileWeapon::Fire()
+void ASProjectileWeapon::Fire()
 {
 
 	AActor* MyOwner = GetOwner();
@@ -26,5 +26,5 @@ bool ASProjectileWeapon::Fire()
 		
 	}
 
-	return false;
+	//return false;
 }

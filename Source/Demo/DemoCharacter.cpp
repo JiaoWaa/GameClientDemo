@@ -14,6 +14,8 @@
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
 #include "Animation/AnimMontage.h"
+#include "Components/SHealthComponent.h"
+#include "Demo/Demo.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADemoCharacter
@@ -34,6 +36,8 @@ void ADemoCharacter::BeginPlay()
 			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
 		}
 	}
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &ADemoCharacter::OnHealthChanged);
 
 	/*FActorSpawnParameters SpawmParams;
 	SpawmParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -62,6 +66,23 @@ void ADemoCharacter::OnGoalUpdate()
 	if (GetLocalRole() == ROLE_Authority)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("SERVER"));
+	}
+}
+
+
+void ADemoCharacter::OnHealthChanged(USHealthComponent* OwnerHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (bIsDead) return;
+	if (Health <= 0 && !bIsDead)
+	{
+		bIsDead = true;
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		/* 因为还有部分蓝图在销毁Controller后还在执行某些Controller相关的操作，所以暂时不加上这两句，待蓝图部分的逻辑处理完了再加上
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(3.0f);
+		*/
 	}
 }
 
@@ -99,9 +120,15 @@ ADemoCharacter::ADemoCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
+	HealthComp = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComp"));
+
 	//SetReplicates(true);
 	WeaponAttachSocketName = "WeaponSocket";
 	Goal = 0;
+
+	bIsDead = false;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -205,7 +232,8 @@ void ADemoCharacter::Fire()
 {
 	if (CurrentWeapon)
 	{
-		bool isHitTarget = CurrentWeapon->Fire();
+		bool isHitTarget = false;
+		CurrentWeapon->StartFire();
 
 		if (isHitTarget)
 		{
@@ -218,6 +246,14 @@ void ADemoCharacter::Fire()
 				SetGoal();
 			}
 		}
+	}
+}
+
+void ADemoCharacter::StopFire()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->StopFire();
 	}
 }
 

@@ -20,6 +20,7 @@ class ADemoCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
 public:
 	ADemoCharacter();
 
@@ -79,6 +80,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void Fire();
 
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void StopFire();
+
 	//UFUNCTION(BlueprintNativeEvent, Category = "Player")
 	//void Fire();
 
@@ -92,6 +96,15 @@ protected:
 	void OnRep_Goal();
 
 	void OnGoalUpdate();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class USHealthComponent* HealthComp;
+
+	UFUNCTION()
+	void OnHealthChanged(USHealthComponent* OwnerHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	bool bIsDead;
 
 public:
 	/** Returns CameraBoom subobject **/

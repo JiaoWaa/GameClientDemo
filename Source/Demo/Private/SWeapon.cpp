@@ -7,6 +7,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/DamageType.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "TimerManager.h"
+#include "Demo/Demo.h"
 
 // Sets default values
 ASWeapon::ASWeapon()
@@ -20,6 +23,9 @@ ASWeapon::ASWeapon()
 	MuzzleSocketName = "MuzzleSocket";
 	TracerTargetName = "Target";
 
+	BaseDamage = 20;
+	RateOfFire = 600;
+
 	SetReplicates(true);
 }
 
@@ -27,12 +33,14 @@ ASWeapon::ASWeapon()
 void ASWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TimeBetweenShots = 60 / RateOfFire;
 	
 }
 
-bool ASWeapon::Fire()
+void ASWeapon::Fire()
 {
-	bool bIsHitTarget = false;
+	//bool bIsHitTarget = false;
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Fire!"));
 
 	if (GetLocalRole() < ROLE_Authority)
@@ -45,7 +53,6 @@ bool ASWeapon::Fire()
 	AActor* MyOwner = GetOwner();
 	if (MyOwner) 
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Local Fire Call"));
 		FVector EyeLocation;
 		FRotator EyeRotator;
 		MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotator);
@@ -55,27 +62,63 @@ bool ASWeapon::Fire()
 		QueryParams.AddIgnoredActor(MyOwner);
 		QueryParams.AddIgnoredActor(this);
 		QueryParams.bTraceComplex = true;
+		QueryParams.bReturnPhysicalMaterial = true;
+
 		FVector TraceEndPoint = TraceEnd;
-		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, QueryParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 		{
 			AActor* HitActor = Hit.GetActor();
 			
 			//GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Red, HitActor->GetName());
-			if (HitActor->GetName() == TEXT("BP_Target_2"))
-				bIsHitTarget = true;
+			//if (HitActor->GetName() == TEXT("BP_Target_2"))
+			//	bIsHitTarget = true;
 
-			UGameplayStatics::ApplyPointDamage(HitActor, 20, EyeRotator.Vector(), Hit, MyOwner->GetInstigatorController(), this, DamageType);
+			//UGameplayStatics::ApplyPointDamage(HitActor, 20, EyeRotator.Vector(), Hit, MyOwner->GetInstigatorController(), this, DamageType);
 
-			if (ImpactEffect)
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+			UParticleSystem* SelectedEffect = nullptr;
+			EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+
+			float ActualDamage = BaseDamage;
+
+			if (SurfaceType == SURFACE_FLESHVULNERABLE)
+			{
+				ActualDamage *= 4;
+			}
+
+			switch (SurfaceType)
+			{
+			case SURFACE_FLESHDEFAULT:
+			case SURFACE_FLESHVULNERABLE:
+				SelectedEffect = FleshImpactEffect;
+				break;
+			default:
+				SelectedEffect = DefaultImpactEffect;
+				break;
+			}
+
+			UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, EyeRotator.Vector(), Hit, MyOwner->GetInstigatorController(), this, DamageType);
+
+			if (SelectedEffect)
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectedEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 			TraceEndPoint = Hit.ImpactPoint;
 		}
-		//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
 
 		PlayFireEffects(TraceEndPoint);
+		LastFireTime = GetWorld()->TimeSeconds;
 	}
 
-	return bIsHitTarget;
+	//return bIsHitTarget;
+}
+
+void ASWeapon::StartFire()
+{
+	float FirstDelay = FMath::Max(0.0f, LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds);
+	GetWorldTimerManager().SetTimer(TimerHandleTimeBetweenShots, this, &ASWeapon::Fire, TimeBetweenShots, true, FirstDelay);
+}
+
+void ASWeapon::StopFire()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandleTimeBetweenShots);
 }
 
 /*void ASWeapon::ServerFire_Implementation()

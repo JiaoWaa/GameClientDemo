@@ -15,7 +15,7 @@ class DEMO_API ASProjectileWeapon : public ASWeapon
 	GENERATED_BODY()
 	
 public:
-	virtual bool Fire() override;
+	virtual void Fire() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<AActor> ProjectileClass;
