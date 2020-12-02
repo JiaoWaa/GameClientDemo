@@ -7,6 +7,24 @@
 #include "SWeapon.generated.h"
 
 class UDamageType;
+
+USTRUCT()
+struct FHitScanTrace
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	FVector_NetQuantize TraceTo;
+
+	UPROPERTY()
+	TEnumAsByte<EPhysicalSurface> SurfaceType;
+
+	UPROPERTY()
+	uint8 BurstCounter;
+protected:
+};
+
 UCLASS()
 class DEMO_API ASWeapon : public AActor
 {
@@ -54,6 +72,15 @@ protected:
 	float TimeBetweenShots;
 
 	void PlayFireEffects(FVector TraceEnd);
+
+	UPROPERTY(ReplicatedUsing=OnRep_HitScanTrace)
+	FHitScanTrace HitScanTrace;
+
+	UFUNCTION()
+	void OnRep_HitScanTrace();
+
+	void PlayImpactEffects(EPhysicalSurface SurfaceType, const FVector& ImpactPoint);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -65,10 +92,12 @@ public:
 
 	void StopFire();
 	
-	/*UFUNCTION(Server, Reliable, WithValidation)
-	void ServerFire();*/
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFire();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	TSubclassOf<UDamageType> DamageType;
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 };
