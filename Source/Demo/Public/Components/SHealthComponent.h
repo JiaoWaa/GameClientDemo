@@ -21,7 +21,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HealthComponent")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "HealthComponent")
 	float Health;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HealthComponent")
@@ -36,4 +36,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnHealthChangedSignature OnHealthChanged;
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

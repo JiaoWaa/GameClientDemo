@@ -168,6 +168,7 @@ void ADemoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ADemoCharacter, CurrentWeapon);
 	DOREPLIFETIME(ADemoCharacter, Goal);
+	DOREPLIFETIME(ADemoCharacter, bIsDead);
 }
 
 void ADemoCharacter::SetGoal()
