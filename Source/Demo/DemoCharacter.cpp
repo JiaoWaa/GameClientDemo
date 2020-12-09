@@ -13,9 +13,12 @@
 #include "SWeapon.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Animation/AnimMontage.h"
 #include "Components/SHealthComponent.h"
 #include "Demo/Demo.h"
+#include "MyPlayerState.h"
+#include "MyGameMode.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADemoCharacter
@@ -78,7 +81,16 @@ void ADemoCharacter::OnHealthChanged(USHealthComponent* OwnerHealthComp, float H
 		bIsDead = true;
 		GetMovementComponent()->StopMovementImmediately();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		GetCameraBoom()->bDoCollisionTest = false;
+		CameraBoom->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
+		
+		SetLifeSpan(5.0f);
+		CurrentWeapon->SetLifeSpan(5.0f);
+		Die(HealthDelta, DamageType, InstigatedBy, DamageCauser);
 
+		GetWorldTimerManager().SetTimer(TimerHandleRebirth, this, &ADemoCharacter::Rebirth, 3.0f, false);
+		
 		/* 因为还有部分蓝图在销毁Controller后还在执行某些Controller相关的操作，所以暂时不加上这两句，待蓝图部分的逻辑处理完了再加上
 		DetachFromControllerPendingDestroy();
 		SetLifeSpan(3.0f);
@@ -152,10 +164,6 @@ void ADemoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ADemoCharacter::LookUpAtRate);
 
-	// handle touch devices
-	//PlayerInputComponent->BindTouch(IE_Pressed, this, &ADemoCharacter::TouchStarted);
-	//PlayerInputComponent->BindTouch(IE_Released, this, &ADemoCharacter::TouchStopped);
-
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ADemoCharacter::OnResetVR);
 
@@ -165,6 +173,8 @@ void ADemoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 void ADemoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ADemoCharacter, ControllerRotation, COND_SkipOwner);
 
 	DOREPLIFETIME(ADemoCharacter, CurrentWeapon);
 	DOREPLIFETIME(ADemoCharacter, Goal);
@@ -206,6 +216,37 @@ void ADemoCharacter::SetCurrentWeapon()
 	{
 		CurrentWeapon->SetOwner(this);
 		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+	}
+}
+
+bool ADemoCharacter::Die(float KillingDamage, const class UDamageType* DamageType, class AController* Killer, class AActor* DamageCauser)
+{
+	Killer = GetDamageInstigator(Killer, *DamageType);
+
+	AController* const KilledPlayer = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
+	
+	if (GetWorld()->GetAuthGameMode<AMyGameMode>())
+	{
+		GetWorld()->GetAuthGameMode<AMyGameMode>()->Killed(Killer, KilledPlayer, DamageType);
+	}
+
+	return true;
+}
+
+void ADemoCharacter::Rebirth()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandleRebirth);
+	GetWorld()->GetAuthGameMode<AMyGameMode>()->OnPlayerKilled(this);
+}
+
+void ADemoCharacter::SetControllerRotation()
+{
+	if (GetLocalRole() == ROLE_Authority || IsLocallyControlled())
+	{
+		if (GetController() != NULL)
+		{
+			ControllerRotation = GetController()->GetControlRotation();
+		}
 	}
 }
 
@@ -262,16 +303,6 @@ void ADemoCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
-
-/*void ADemoCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		Jump();
-}
-
-void ADemoCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
-}*/
 
 void ADemoCharacter::TurnAtRate(float Rate)
 {

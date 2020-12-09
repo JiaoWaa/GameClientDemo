@@ -13,7 +13,7 @@ USHealthComponent::USHealthComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 	
 	DefaultHealth = 100.0f;
-	SetIsReplicated(true);
+	//SetIsReplicated(true);
 
 }
 
@@ -33,7 +33,13 @@ void USHealthComponent::BeginPlay()
 	}
 	
 	Health = DefaultHealth;
-	
+
+	/* 
+	* Here is a problem: SetIsReplicated() shuold be called in constructor, but when I use DEBUG to run the editor, there'll be a breakpoint
+	* Ones I put it to BeginPlay() to call, it can successfully run. 
+	* I still haven't find the reason.
+	*/
+	SetIsReplicated(true); 
 }
 
 

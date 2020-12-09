@@ -63,6 +63,9 @@ protected:
 
 	//void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
+private:
+	void Rebirth();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -106,6 +109,8 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bIsDead;
 
+	FTimerHandle TimerHandleRebirth;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -142,6 +147,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentWeapon();
+
+	virtual bool Die(float KillingDamage, const class UDamageType* DamageType, class AController* Killer, class AActor* DamageCauser);
+
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	FRotator ControllerRotation;
+
+	UFUNCTION(BlueprintCallable)
+	void SetControllerRotation();
 
 };
 
