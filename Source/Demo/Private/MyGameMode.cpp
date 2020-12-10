@@ -16,7 +16,10 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	PlayerControllerClass = AMyPlayerController::StaticClass();
 	PlayerStateClass = AMyPlayerState::StaticClass();
-	GameStateClass = AMyGameState::StaticClass();
+
+	static ConstructorHelpers::FClassFinder<AGameState> CurrentGameState(TEXT("/Game/ThirdPersonCPP/Blueprints/BP_MyGameState"));
+	GameStateClass = CurrentGameState.Class;
+	//GameStateClass = AMyGameState::StaticClass();
 
 	RoundTime = 60;
 }
@@ -46,6 +49,7 @@ void AMyGameMode::DefaultTimer()
 
 		if (CurrentGameState->RemainingTime <= 0)
 		{
+			CurrentGameState->ShowRankboard();
 			FinishMatch();
 		}
 	}
@@ -134,4 +138,5 @@ void AMyGameMode::FinishMatch()
 			Pawn->TurnOff();
 		}
 	}
+
 }

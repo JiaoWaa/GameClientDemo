@@ -34,4 +34,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	TArray<int32> GetPlayerScoreList();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowRankboard();
 };
