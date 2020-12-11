@@ -27,6 +27,13 @@ For some reasons of net and wrong operations, I created a new project named **De
 - Grenade weapon and explosion effect.
 - Four physics materials: grass, ground, wood and water. 
 
+**Sixth Homework Statement:** Net
+
+- A dedicated server is used.
+- Replicated: Gun, shoot effects, death animation, rebirth, kill number, death number, scoreboard, aim offset, montage(like 'throw')
+- once competition includes 60s, and the competition is a loop with 5s between each competition.
+- ones the game is over, the scoreboard will be shown. It shows name, kill, death and score(kill: +2, death: -1)
+
 ## Package Files and video
 
 Link: https://pan.baidu.com/s/1Ib5EYS09hUD7_Xym1qJJfQ 
