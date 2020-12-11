@@ -19,6 +19,7 @@
 #include "Demo/Demo.h"
 #include "MyPlayerState.h"
 #include "MyGameMode.h"
+#include "TimerManager.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADemoCharacter

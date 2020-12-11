@@ -8,3 +8,4 @@ void AMyPlayerController::GameHasEnded(class AActor* EndGameFocus /*= NULL*/, bo
 {
 	Super::GameHasEnded(EndGameFocus, bIsWinner);
 }
+

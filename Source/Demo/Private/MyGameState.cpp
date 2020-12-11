@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "MyPlayerController.h"
 #include "MyPlayerState.h"
+#include "Engine/World.h"
 
 void AMyGameState::UpdateAllPlayersInfo()
 {

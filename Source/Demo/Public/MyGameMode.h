@@ -16,6 +16,10 @@ class DEMO_API AMyGameMode : public AGameMode
 
 	virtual void PreInitializeComponents() override;
 
+	virtual void HandleMatchIsWaitingToStart() override;
+
+	virtual void HandleMatchHasStarted() override;
+
 	virtual void DefaultTimer();
 
 protected:
@@ -23,7 +27,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 RoundTime;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 TimeBetweenMatches;
+
 	FTimerHandle TimerHandle_DefaultTimer;
+
+	//FTimerHandle TimerHandle_Restart;
 
 	TArray<FString> PlayerNameList;
 

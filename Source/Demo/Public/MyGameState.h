@@ -37,4 +37,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowRankboard();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void CloseRankboard();
 };

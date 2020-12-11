@@ -22,6 +22,7 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	//GameStateClass = AMyGameState::StaticClass();
 
 	RoundTime = 60;
+	TimeBetweenMatches = 5;
 }
 
 void AMyGameMode::PreInitializeComponents()
@@ -32,6 +33,21 @@ void AMyGameMode::PreInitializeComponents()
 	CurrentGameState->RemainingTime = RoundTime;
 
 	GetWorldTimerManager().SetTimer(TimerHandle_DefaultTimer, this, &AMyGameMode::DefaultTimer, GetWorldSettings()->GetEffectiveTimeDilation(), true);
+}
+
+void AMyGameMode::HandleMatchIsWaitingToStart()
+{
+	AMyGameState* const CurrentGameState = Cast<AMyGameState>(GameState);
+	CurrentGameState->RemainingTime = 2.0f;
+}
+
+void AMyGameMode::HandleMatchHasStarted()
+{
+	Super::HandleMatchHasStarted();
+
+	AMyGameState* const CurrentGameState = Cast<AMyGameState>(GameState);
+	CurrentGameState->RemainingTime = RoundTime;
+	CurrentGameState->CloseRankboard();
 }
 
 void AMyGameMode::DefaultTimer()
@@ -49,8 +65,29 @@ void AMyGameMode::DefaultTimer()
 
 		if (CurrentGameState->RemainingTime <= 0)
 		{
-			CurrentGameState->ShowRankboard();
-			FinishMatch();
+			if (GetMatchState() == MatchState::WaitingPostMatch)
+			{
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Restart!!!!!!"));
+				}
+				RestartGame();
+
+				GetWorld()->ServerTravel("/Game/ThirdPersonCPP/Maps/ShootMap");
+			}
+			else if (GetMatchState() == MatchState::InProgress)
+			{
+				CurrentGameState->ShowRankboard();
+				FinishMatch();
+			}
+			else if (GetMatchState() == MatchState::WaitingToStart)
+			{
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Start*****"));
+				}
+				StartMatch();
+			}
 		}
 	}
 }
@@ -137,6 +174,8 @@ void AMyGameMode::FinishMatch()
 		{
 			Pawn->TurnOff();
 		}
+
+		CurrentGameState->RemainingTime = TimeBetweenMatches;
 	}
 
 }

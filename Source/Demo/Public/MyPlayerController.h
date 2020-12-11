@@ -16,6 +16,6 @@ class DEMO_API AMyPlayerController : public APlayerController
 	
 
 public:
-
 	virtual void GameHasEnded(class AActor* EndGameFocus = NULL, bool bIsWinner = false) override;
+
 };
