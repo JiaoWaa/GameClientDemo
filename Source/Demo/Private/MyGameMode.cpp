@@ -21,7 +21,7 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	GameStateClass = CurrentGameState.Class;
 	//GameStateClass = AMyGameState::StaticClass();
 
-	RoundTime = 60;
+	RoundTime = 300;
 	TimeBetweenMatches = 5;
 }
 

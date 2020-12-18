@@ -81,6 +81,9 @@ protected:
 
 	void PlayImpactEffects(EPhysicalSurface SurfaceType, const FVector& ImpactPoint);
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin=0.0f))
+	float BulletSpread;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

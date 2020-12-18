@@ -34,6 +34,22 @@ For some reasons of net and wrong operations, I created a new project named **De
 - once competition includes 60s, and the competition is a loop with 5s between each competition.
 - ones the game is over, the scoreboard will be shown. It shows name, kill, death and score(kill: +2, death: -1)
 
+**Seventh Homework Statement:** AI
+
+- Two kinds of AI enemies: Sniper and Canister.
+- Sniper: 
+  - patrolling
+  - wide range of vision, can search players quicker
+  - shoot farer
+  - tend to find a safe place to attack player
+  - if health < 40, it will find a place that the player can not attack to escape
+- Canister:
+  - patrolling
+  - narrow vision
+  - attack the player closely
+  - tend to find the nearest location to attack the player instead of a safe place
+  - not afraid of death, only if health < 10, it will find a place that the player can not attack to escape
+
 ## Package Files and video
 
 Link: https://pan.baidu.com/s/1Ib5EYS09hUD7_Xym1qJJfQ 

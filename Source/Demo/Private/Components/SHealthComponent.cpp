@@ -70,3 +70,8 @@ void USHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(USHealthComponent, Health);
 }
 
+float USHealthComponent::GetHealth()
+{
+	return Health;
+}
+

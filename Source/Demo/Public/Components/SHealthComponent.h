@@ -38,4 +38,6 @@ public:
 	FOnHealthChangedSignature OnHealthChanged;
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	float GetHealth();
 };

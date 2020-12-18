@@ -80,12 +80,6 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
 
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	void Fire();
-
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	void StopFire();
-
 	//UFUNCTION(BlueprintNativeEvent, Category = "Player")
 	//void Fire();
 
@@ -155,6 +149,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetControllerRotation();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void Fire();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void StopFire();
 
 };
 
