@@ -74,14 +74,8 @@ protected:
 	UPROPERTY(Replicated)
 	class ASWeapon* CurrentWeapon;
 
-	//UPROPERTY(EditDefaultsOnly, Category = "Player")
-	//TSubclassOf<class ASWeapon> StartWeaponClass;
-
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
-
-	//UFUNCTION(BlueprintNativeEvent, Category = "Player")
-	//void Fire();
 
 	virtual void BeginPlay() override;
 
@@ -136,11 +130,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	class UAnimMontage* ThrowMontageAnim;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	TSubclassOf<class ASWeapon> StartWeaponClass;
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentWeapon();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerChangeWeapon();
 
 	virtual bool Die(float KillingDamage, const class UDamageType* DamageType, class AController* Killer, class AActor* DamageCauser);
 
@@ -156,5 +153,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void StopFire();
 
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void SetWeaponClass(class ASWeapon* GoalWeaponClass);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetWeaponClass(class ASWeapon* GoalWeaponClass);
 };
 

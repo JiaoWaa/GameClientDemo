@@ -43,15 +43,6 @@ void ADemoCharacter::BeginPlay()
 
 	HealthComp->OnHealthChanged.AddDynamic(this, &ADemoCharacter::OnHealthChanged);
 
-	/*FActorSpawnParameters SpawmParams;
-	SpawmParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StartWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawmParams);
-
-	if (CurrentWeapon)
-	{
-		CurrentWeapon->SetOwner(this);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
-	}*/
 }
 
 
@@ -180,6 +171,7 @@ void ADemoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ADemoCharacter, CurrentWeapon);
 	DOREPLIFETIME(ADemoCharacter, Goal);
 	DOREPLIFETIME(ADemoCharacter, bIsDead);
+	DOREPLIFETIME(ADemoCharacter, StartWeaponClass);
 }
 
 void ADemoCharacter::SetGoal()
@@ -204,11 +196,22 @@ void ADemoCharacter::ThrowMontage(UAnimMontage* ThrowAnim)
 
 void ADemoCharacter::SetCurrentWeapon()
 {
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ServerChangeWeapon();
+		return;
+	}
+
 	FActorSpawnParameters SpawmParams;
 	SpawmParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->Destroy();
+		bool R = CurrentWeapon->Destroy();
+		/*if (GEngine)
+		{
+			FString bResult = R ? "true" : "false";
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, bResult);
+		}*/
 	}
 
 	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StartWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawmParams);
@@ -218,6 +221,16 @@ void ADemoCharacter::SetCurrentWeapon()
 		CurrentWeapon->SetOwner(this);
 		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
 	}
+}
+
+void ADemoCharacter::ServerChangeWeapon_Implementation()
+{
+	SetCurrentWeapon();
+}
+
+bool ADemoCharacter::ServerChangeWeapon_Validate()
+{
+	return true;
 }
 
 bool ADemoCharacter::Die(float KillingDamage, const class UDamageType* DamageType, class AController* Killer, class AActor* DamageCauser)
@@ -298,6 +311,27 @@ void ADemoCharacter::StopFire()
 	{
 		CurrentWeapon->StopFire();
 	}
+}
+
+void ADemoCharacter::SetWeaponClass(class ASWeapon* GoalWeaponClass)
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ServerSetWeaponClass(GoalWeaponClass);
+		return;
+	}
+
+	GoalWeaponClass = GoalWeaponClass;
+}
+
+void ADemoCharacter::ServerSetWeaponClass_Implementation(class ASWeapon* GoalWeaponClass)
+{
+	SetWeaponClass(GoalWeaponClass);
+}
+
+bool ADemoCharacter::ServerSetWeaponClass_Validate(class ASWeapon* GoalWeaponClass)
+{
+	return true;
 }
 
 void ADemoCharacter::OnResetVR()

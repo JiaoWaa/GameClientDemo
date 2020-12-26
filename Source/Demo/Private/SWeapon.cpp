@@ -11,6 +11,8 @@
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
 #include "Demo/Demo.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASWeapon::ASWeapon()
@@ -69,6 +71,8 @@ void ASWeapon::Fire()
 
 		FVector TraceEndPoint = TraceEnd;
 		EPhysicalSurface SurfaceType = EPhysicalSurface::SurfaceType_Default;
+
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), RifleFireSound, EyeLocation);
 
 		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 		{
@@ -169,6 +173,22 @@ void ASWeapon::PlayImpactEffects(EPhysicalSurface SurfaceType, const FVector& Im
 	default:
 		SelectedEffect = DefaultImpactEffect;
 		break;
+	}
+
+	if (SurfaceType == SURFACE_FLESHDEFAULT)
+	{
+		if (DefaultAttackSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), DefaultAttackSound, ImpactPoint);
+		}
+	}
+
+	if (SurfaceType == SURFACE_FLESHVULNERABLE)
+	{
+		if (HeadAttackSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), HeadAttackSound, ImpactPoint);
+		}
 	}
 
 	if (SelectedEffect) 

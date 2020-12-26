@@ -17,6 +17,8 @@ class DEMO_API ASProjectileWeapon : public ASWeapon
 public:
 	virtual void Fire() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<AActor> ProjectileClass;
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

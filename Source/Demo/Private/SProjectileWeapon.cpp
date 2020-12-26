@@ -4,9 +4,15 @@
 #include "SProjectileWeapon.h"
 #include "Engine/World.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Net/UnrealNetwork.h"
 
 void ASProjectileWeapon::Fire()
 {
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ServerFire();
+		return;
+	}
 
 	AActor* MyOwner = GetOwner();
 	if (MyOwner)
@@ -27,4 +33,11 @@ void ASProjectileWeapon::Fire()
 	}
 
 	//return false;
+}
+
+void ASProjectileWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASProjectileWeapon, ProjectileClass);
 }

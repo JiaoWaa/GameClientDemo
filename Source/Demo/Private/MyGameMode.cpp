@@ -54,10 +54,10 @@ void AMyGameMode::DefaultTimer()
 {
 	AMyGameState* const CurrentGameState = Cast<AMyGameState>(GameState);
 
-	if (GEngine)
+	/*if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::FromInt(CurrentGameState->RemainingTime));
-	}
+	}*/
 
 	if (CurrentGameState && CurrentGameState->RemainingTime > 0)
 	{
@@ -67,10 +67,10 @@ void AMyGameMode::DefaultTimer()
 		{
 			if (GetMatchState() == MatchState::WaitingPostMatch)
 			{
-				if (GEngine)
+				/*if (GEngine)
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Restart!!!!!!"));
-				}
+				}*/
 				RestartGame();
 
 				GetWorld()->ServerTravel("/Game/ThirdPersonCPP/Maps/ShootMap");
@@ -82,10 +82,10 @@ void AMyGameMode::DefaultTimer()
 			}
 			else if (GetMatchState() == MatchState::WaitingToStart)
 			{
-				if (GEngine)
+				/*if (GEngine)
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Start*****"));
-				}
+				}*/
 				StartMatch();
 			}
 		}
